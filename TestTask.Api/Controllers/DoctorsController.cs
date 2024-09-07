@@ -9,7 +9,7 @@ namespace TestTask.Api.Controllers
     public class DoctorsController(IDoctorService doctorService, ILogger<DoctorsController> logger) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DoctorListDto>>> GetDoctors([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "FullName")
+        public async Task<ActionResult<IEnumerable<DoctorListDto>>> GetDoctors([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "SpecializationName")
         {
             var doctors = await doctorService.GetDoctorsAsync(pageNumber, pageSize, sortBy);
             return Ok(doctors);

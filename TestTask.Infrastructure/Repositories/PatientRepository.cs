@@ -7,11 +7,10 @@ namespace TestTask.Infrastructure.Repositories
 {
     public class PatientRepository(ApplicationDbContext context) : IPatientRepository
     {
-        public async Task<IEnumerable<Patient>> GetAllAsync(int pageNumber, int pageSize, string sortBy)
+        public async Task<IEnumerable<Patient>> GetAllAsync(int pageNumber, int pageSize)
         {
             return await context.Patients
                 .Include(p => p.Uchastok)
-                .OrderBy(p => EF.Property<object>(p, sortBy))
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
