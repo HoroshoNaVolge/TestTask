@@ -4,7 +4,7 @@ namespace TestTask.Domain.Interfaces
 {
     public interface IDoctorRepository
     {
-        Task<IEnumerable<Doctor>> GetAllAsync(int pageNumber, int pageSize);
+        Task<IEnumerable<Doctor>> GetAllAsync(int pageNumber, int pageSize, string sortBy);
         Task<Doctor?> GetByIdAsync(int id);
         Task AddAsync(Doctor doctor);
         Task UpdateAsync(Doctor doctor);

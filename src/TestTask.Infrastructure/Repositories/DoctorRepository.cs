@@ -7,15 +7,19 @@ namespace TestTask.Infrastructure.Repositories
 {
     public class DoctorRepository(ApplicationDbContext context) : IDoctorRepository
     {
-        public async Task<IEnumerable<Doctor>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<IEnumerable<Doctor>> GetAllAsync(int pageNumber, int pageSize, string sortBy)
         {
-            return await context.Doctors
-                .Include(d =>d.Uchastok)
+            IQueryable<Doctor> query = context.Doctors
+                .Include(d => d.Uchastok)
                 .Include(d => d.Cabinet)
-                .Include(d => d.Specialization)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+                .Include(d => d.Specialization);
+
+            query = ApplySorting(query, sortBy);
+
+            return await query
+               .Skip((pageNumber - 1) * pageSize)
+               .Take(pageSize)
+               .ToListAsync();
         }
 
         public async Task<Doctor?> GetByIdAsync(int id)
@@ -23,7 +27,7 @@ namespace TestTask.Infrastructure.Repositories
             return await context.Doctors
                 .Include(d => d.Cabinet)
                 .Include(d => d.Specialization)
-                .Include(d=>d.Uchastok)
+                .Include(d => d.Uchastok)
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
 
@@ -47,6 +51,17 @@ namespace TestTask.Infrastructure.Repositories
                 context.Doctors.Remove(doctor);
                 await context.SaveChangesAsync();
             }
+        }
+
+        private static IQueryable<Doctor> ApplySorting(IQueryable<Doctor> query, string sortBy)
+        {
+            return sortBy switch
+            {
+                "CabinetNumber" => query.OrderBy(d => d.Cabinet!.Number),
+                "SpecializationName" => query.OrderBy(d => d.Specialization!.Name),
+                "UchastokNumber" => query.OrderBy(d => d.Uchastok!.Number),
+                _ => query.OrderBy(d => d.Id)
+            };
         }
     }
 }
