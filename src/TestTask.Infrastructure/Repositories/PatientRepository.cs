@@ -2,18 +2,22 @@
 using TestTask.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using TestTask.Domain.Interfaces;
+using System.Globalization;
 
 namespace TestTask.Infrastructure.Repositories
 {
     public class PatientRepository(ApplicationDbContext context) : IPatientRepository
     {
-        public async Task<IEnumerable<Patient>> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<IEnumerable<Patient>> GetAllAsync(int pageNumber, int pageSize, string sortBy)
         {
-            return await context.Patients
-                .Include(p => p.Uchastok)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            IQueryable<Patient> query = context.Patients.Include(d => d.Uchastok);
+
+            query = ApplySorting(query, sortBy);
+
+            return await query
+               .Skip((pageNumber - 1) * pageSize)
+               .Take(pageSize)
+               .ToListAsync();
         }
 
         public async Task<Patient?> GetByIdAsync(int id)
@@ -43,6 +47,15 @@ namespace TestTask.Infrastructure.Repositories
                 context.Patients.Remove(patient);
                 await context.SaveChangesAsync();
             }
+        }
+
+        private static IQueryable<Patient> ApplySorting(IQueryable<Patient> query, string sortBy)
+        {
+            return sortBy switch
+            {
+                "UchastokNumber" => query.OrderBy(p => p.Uchastok!.Number),
+                _ => query.OrderBy(p => p.Id)
+            };
         }
     }
 }

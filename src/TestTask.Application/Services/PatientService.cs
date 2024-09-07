@@ -10,11 +10,9 @@ namespace TestTask.Application.Services
     {
         public async Task<IEnumerable<PatientListDto>> GetPatientsAsync(int pageNumber, int pageSize, string sortBy)
         {
-            var patients = await patientRepository.GetAllAsync(pageNumber, pageSize);
+            var patients = await patientRepository.GetAllAsync(pageNumber, pageSize, sortBy);
 
-            var patientsDtos = mapper.Map<IEnumerable<PatientListDto>>(patients);
-
-            return SortPatients(patientsDtos, sortBy);            
+            return mapper.Map<IEnumerable<PatientListDto>>(patients);
         }
 
         public async Task<PatientEditDto> GetPatientByIdAsync(int id)

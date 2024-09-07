@@ -16,11 +16,9 @@ namespace TestTask.Application.Services
     {
         public async Task<IEnumerable<DoctorListDto>> GetDoctorsAsync(int pageNumber, int pageSize, string sortBy)
         {
-            var doctors = await doctorRepository.GetAllAsync(pageNumber, pageSize);
+            var doctors = await doctorRepository.GetAllAsync(pageNumber, pageSize, sortBy);
 
-            var doctorDtos = mapper.Map<IEnumerable<DoctorListDto>>(doctors);
-
-            return SortDoctors(doctorDtos, sortBy);
+            return mapper.Map<IEnumerable<DoctorListDto>>(doctors);
         }
 
         public async Task<DoctorEditDto> GetDoctorByIdAsync(int id)
@@ -68,13 +66,5 @@ namespace TestTask.Application.Services
             if (doctorDto.UchastokId != null && !await uchastokRepository.ExistsAsync(doctorDto.UchastokId.Value))
                 throw new ArgumentException("Uchastok with specified ID does not exist.");
         }
-
-        private static IEnumerable<DoctorListDto> SortDoctors(IEnumerable<DoctorListDto> doctors, string sortBy) => sortBy switch
-        {
-            "CabinetNumber" => doctors.OrderBy(d => d.CabinetNumber),
-            "SpecializationName" => doctors.OrderBy(d => d.SpecializationName),
-            "UchastokNumber" => doctors.OrderBy(d => d.UchastokNumber),
-            _ => doctors.OrderBy(d => d.Id)
-        };
     }
 }

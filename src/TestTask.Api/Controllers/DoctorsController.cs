@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TestTask.Application.Interfaces;
 using TestTask.Application.DTOs;
+using TestTask.Api.Validation;
 
 namespace TestTask.Api.Controllers
 {
@@ -11,6 +12,10 @@ namespace TestTask.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DoctorListDto>>> GetDoctors([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "SpecializationName")
         {
+            var validationResult = ValidationHelper.ValidatePageParameters(pageNumber, pageSize);
+            if (validationResult != null)
+                return validationResult;
+            
             var doctors = await doctorService.GetDoctorsAsync(pageNumber, pageSize, sortBy);
             return Ok(doctors);
         }

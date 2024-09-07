@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
@@ -18,9 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TestTask.Api\TestTask.Api.csproj" />
-    <ProjectReference Include="..\TestTask.Application\TestTask.Application.csproj" />
-    <ProjectReference Include="..\TestTask.Infrastructure\TestTask.Infrastructure.csproj" />
+    <ProjectReference Include="..\src\TestTask.Api\TestTask.Api.csproj" />
+    <ProjectReference Include="..\src\TestTask.Application\TestTask.Application.csproj" />
+    <ProjectReference Include="..\src\TestTask.Infrastructure\TestTask.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
