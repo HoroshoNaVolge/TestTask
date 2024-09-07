@@ -2,9 +2,10 @@
 
 namespace TestTask.Application.DTOs
 {
+    // В задании указано DTO без лишних полей, поэтому без ФИО и игнорим Id.
     public class DoctorListDto
     {
-        [JsonIgnore]
+        [JsonIgnore] 
         public int Id { get; set; }
         public string? CabinetNumber { get; set; }
         public string? SpecializationName { get; set; }

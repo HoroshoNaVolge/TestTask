@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTask.Domain", "TestTask
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTask.Application", "TestTask.Application\TestTask.Application.csproj", "{C01B12F1-15CA-4B93-BC2C-26F79311A86B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTask.Infrastructure", "TestTask.Infrastructure\TestTask.Infrastructure.csproj", "{EAFEF9E8-7AB0-4748-B790-D3C04C5EEEE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTask.Infrastructure", "TestTask.Infrastructure\TestTask.Infrastructure.csproj", "{EAFEF9E8-7AB0-4748-B790-D3C04C5EEEE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{8E54222D-6E16-4B34-A122-DC8026C96CE8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{EAFEF9E8-7AB0-4748-B790-D3C04C5EEEE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAFEF9E8-7AB0-4748-B790-D3C04C5EEEE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAFEF9E8-7AB0-4748-B790-D3C04C5EEEE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E54222D-6E16-4B34-A122-DC8026C96CE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E54222D-6E16-4B34-A122-DC8026C96CE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E54222D-6E16-4B34-A122-DC8026C96CE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E54222D-6E16-4B34-A122-DC8026C96CE8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
