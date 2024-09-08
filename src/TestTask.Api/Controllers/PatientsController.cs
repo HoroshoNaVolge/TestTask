@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TestTask.Application.Interfaces;
 using TestTask.Application.DTOs;
-using TestTask.Api.Validation;
+using TestTask.Application.Validation;
 
 namespace TestTask.Api.Controllers
 {
@@ -10,7 +10,7 @@ namespace TestTask.Api.Controllers
     public class PatientsController(IPatientService patientService, ILogger<PatientsController> logger) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PatientListDto>>> GetPatients([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "UchastokName")
+        public async Task<ActionResult<IEnumerable<PatientListDto>>> GetPatients([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "UchastokNumber")
         {
             var validationResult = ValidationHelper.ValidatePageParameters(pageNumber, pageSize);
             if (validationResult != null)
@@ -29,12 +29,15 @@ namespace TestTask.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreatePatient(PatientEditDto patientDto)
+        public async Task<ActionResult> CreatePatient(PatientCreateDto patientDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            
             try
             {
-                await patientService.CreatePatientAsync(patientDto);
-                return CreatedAtAction(nameof(GetPatient), new { id = patientDto.Id }, patientDto);
+                var createdPatientId = await patientService.CreatePatientAsync(patientDto);
+                return CreatedAtAction(nameof(GetPatient), new { id = createdPatientId }, new { id = createdPatientId});
             }
             catch (ArgumentException ex)
             {
@@ -42,7 +45,7 @@ namespace TestTask.Api.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An unexpected error occurred while creating patient with ID {PatientId}", patientDto.Id);
+                logger.LogError(ex, "An unexpected error occurred while creating patient");
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }

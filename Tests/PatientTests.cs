@@ -41,14 +41,14 @@ namespace Tests
             new() { Id = 2, UchastokNumber = "002" }
         };
 
-            _patientRepositoryMock.Setup(repo => repo.GetAllAsync(1, 10, "UchastokName")).ReturnsAsync(patients);
+            _patientRepositoryMock.Setup(repo => repo.GetAllAsync(1, 10, "UchastokNumber")).ReturnsAsync(patients);
             _mapperMock.Setup(mapper => mapper.Map<IEnumerable<PatientListDto>>(It.IsAny<IEnumerable<Patient>>()))
                        .Returns(patientDtos);
 
-            var result = await _patientService.GetPatientsAsync(1, 10, "UchastokName");
+            var result = await _patientService.GetPatientsAsync(1, 10, "UchastokNumber");
 
             Assert.Equal(patientDtos[0].UchastokNumber, result.First().UchastokNumber);
-            _patientRepositoryMock.Verify(repo => repo.GetAllAsync(1, 10, "UchastokName"), Times.Once);
+            _patientRepositoryMock.Verify(repo => repo.GetAllAsync(1, 10, "UchastokNumber"), Times.Once);
             _mapperMock.Verify(mapper => mapper.Map<IEnumerable<PatientListDto>>(patients), Times.Once);
         }
 
@@ -82,16 +82,24 @@ namespace Tests
         [Fact]
         public async Task CreatePatientAsync_AddsPatientToRepository()
         {
-            var patientDto = new PatientEditDto { UchastokId = 1 };
+            var patientDto = new PatientCreateDto { UchastokId = 1 };
             var patient = new Patient { UchastokId = 1 };
+            var expectedId = 1;
 
-            _mapperMock.Setup(mapper => mapper.Map<Patient>(It.IsAny<PatientEditDto>())).Returns(patient);
-            _patientRepositoryMock.Setup(repo => repo.AddAsync(It.IsAny<Patient>())).Returns(Task.CompletedTask);
+            _uchastokRepositoryMock.Setup(repo => repo.ExistsAsync(It.IsAny<int>())).ReturnsAsync(true);
+            _mapperMock.Setup(mapper => mapper.Map<Patient>(patientDto)).Returns(patient);
+            _patientRepositoryMock.Setup(repo => repo.AddAsync(It.IsAny<Patient>()))
+                                                     .Callback<Patient>(p => p.Id = expectedId)
+                                                     .ReturnsAsync(expectedId);
 
-            await _patientService.CreatePatientAsync(patientDto);
 
+            var resultId = await _patientService.CreatePatientAsync(patientDto);
+
+            _uchastokRepositoryMock.Verify(repo => repo.ExistsAsync(patientDto.UchastokId.Value), Times.Once);
             _mapperMock.Verify(mapper => mapper.Map<Patient>(patientDto), Times.Once);
             _patientRepositoryMock.Verify(repo => repo.AddAsync(patient), Times.Once);
+            
+            Assert.Equal(expectedId, resultId);
         }
 
         [Fact]

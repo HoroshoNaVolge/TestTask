@@ -23,10 +23,12 @@ namespace TestTask.Application.Services
             return mapper.Map<PatientEditDto>(patient);
         }
 
-        public async Task CreatePatientAsync(PatientEditDto patientDto)
+        public async Task<int> CreatePatientAsync(PatientCreateDto patientDto)
         {
+            await TryValidateData(patientDto);
+
             var patient = mapper.Map<Patient>(patientDto);
-            await patientRepository.AddAsync(patient);
+            return await patientRepository.AddAsync(patient);
         }
 
         public async Task UpdatePatientAsync(int id, PatientEditDto patientDto)
@@ -44,7 +46,7 @@ namespace TestTask.Application.Services
             await patientRepository.DeleteAsync(id);
         }
 
-        private async Task TryValidateData(PatientEditDto patientDto)
+        private async Task TryValidateData(PatientBaseDto patientDto)
         {
             if (patientDto.UchastokId != null && !await uchastokRepository.ExistsAsync(patientDto.UchastokId.Value))
                 throw new ArgumentException("Uchastok with specified ID does not exist.");

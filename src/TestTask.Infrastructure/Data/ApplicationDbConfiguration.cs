@@ -9,8 +9,10 @@ namespace TestTask.Infrastructure.Data
         public void Configure(EntityTypeBuilder<Uchastok> builder)
         {
             builder.HasData(
-                  new Uchastok { Id = 1, Number = "Тестовый участок №1" },
-                  new Uchastok{ Id = 2, Number = "Тестовый участок №2" });
+                  new Uchastok { Id = 1, Number = "1А" },
+                  new Uchastok { Id = 2, Number = "1Б" },
+                  new Uchastok { Id = 3, Number = "2А" },
+                  new Uchastok { Id = 4, Number = "2Б" });
         }
     }
 
@@ -19,8 +21,10 @@ namespace TestTask.Infrastructure.Data
         public void Configure(EntityTypeBuilder<Cabinet> builder)
         {
             builder.HasData(
-                  new Cabinet { Id = 1, Number = "Тестовый кабинет №1" },
-                  new Cabinet { Id = 2, Number = "Тестовый кабинет №2" });
+                  new Cabinet { Id = 1, Number = "101" },
+                  new Cabinet { Id = 2, Number = "204" },
+                  new Cabinet { Id = 3, Number = "212" },
+                  new Cabinet { Id = 4, Number = "302" });
         }
     }
 
@@ -29,8 +33,10 @@ namespace TestTask.Infrastructure.Data
         public void Configure(EntityTypeBuilder<Specialization> builder)
         {
             builder.HasData(
-                  new Specialization { Id = 1, Name = "Тестовый специализация №1" },
-                  new Specialization { Id = 2, Name = "Тестовая специализация №2" });
+                  new Specialization { Id = 1, Name = "Терапевт" },
+                  new Specialization { Id = 2, Name = "Хирург" },
+                  new Specialization { Id = 3, Name = "Окулист" },
+                  new Specialization { Id = 4, Name = "Педиатр" });
         }
     }
 }
