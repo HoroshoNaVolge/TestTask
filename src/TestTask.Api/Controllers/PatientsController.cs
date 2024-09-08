@@ -76,7 +76,7 @@ namespace TestTask.Api.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"An unexpected error occurred while updating patient with ID {patientDto.Id}");
+                logger.LogError(ex, "An unexpected error occurred while updating patient with ID {patientDto.Id}", patientDto.Id);
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -99,7 +99,7 @@ namespace TestTask.Api.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"An unexpected error occurred while deleting patient with ID {id}");
+                logger.LogError(ex, "An unexpected error occurred while deleting patient with ID {id}", id);
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
