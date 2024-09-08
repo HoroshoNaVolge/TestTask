@@ -41,14 +41,14 @@ namespace Tests
             new() { Id = 2, UchastokNumber = "002" }
         };
 
-            _patientRepositoryMock.Setup(repo => repo.GetAllAsync(1, 10, "UchastokNumber")).ReturnsAsync(patients);
+            _patientRepositoryMock.Setup(repo => repo.GetAllAsync(1, 10, "UchastokNumber",CancellationToken.None)).ReturnsAsync(patients);
             _mapperMock.Setup(mapper => mapper.Map<IEnumerable<PatientListDto>>(It.IsAny<IEnumerable<Patient>>()))
                        .Returns(patientDtos);
 
-            var result = await _patientService.GetPatientsAsync(1, 10, "UchastokNumber");
+            var result = await _patientService.GetPatientsAsync(1, 10, "UchastokNumber", CancellationToken.None);
 
             Assert.Equal(patientDtos[0].UchastokNumber, result.First().UchastokNumber);
-            _patientRepositoryMock.Verify(repo => repo.GetAllAsync(1, 10, "UchastokNumber"), Times.Once);
+            _patientRepositoryMock.Verify(repo => repo.GetAllAsync(1, 10, "UchastokNumber", CancellationToken.None), Times.Once);
             _mapperMock.Verify(mapper => mapper.Map<IEnumerable<PatientListDto>>(patients), Times.Once);
         }
 

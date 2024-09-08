@@ -8,17 +8,18 @@ namespace TestTask.Application.Services
 {
     public class PatientService(IPatientRepository patientRepository, IUchastokRepository uchastokRepository, IMapper mapper) : IPatientService
     {
-        public async Task<IEnumerable<PatientListDto>> GetPatientsAsync(int pageNumber, int pageSize, string sortBy)
+        public async Task<IEnumerable<PatientListDto>> GetPatientsAsync(int pageNumber, int pageSize, string sortBy, CancellationToken cancellationToken)
         {
-            var patients = await patientRepository.GetAllAsync(pageNumber, pageSize, sortBy);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var patients = await patientRepository.GetAllAsync(pageNumber, pageSize, sortBy, cancellationToken);
 
             return mapper.Map<IEnumerable<PatientListDto>>(patients);
         }
 
         public async Task<PatientEditDto> GetPatientByIdAsync(int id)
         {
-            var patient = await patientRepository.GetByIdAsync(id);
-            if (patient == null) return null!;
+            var patient = await patientRepository.GetByIdAsync(id) ?? throw new KeyNotFoundException("patient not found");
 
             return mapper.Map<PatientEditDto>(patient);
         }
@@ -51,11 +52,5 @@ namespace TestTask.Application.Services
             if (patientDto.UchastokId != null && !await uchastokRepository.ExistsAsync(patientDto.UchastokId.Value))
                 throw new ArgumentException("Uchastok with specified ID does not exist.");
         }
-
-        private static IEnumerable<PatientListDto> SortPatients(IEnumerable<PatientListDto> patients, string sortBy) => sortBy switch
-        {
-            "UchastokNumber" => patients.OrderBy(p => p.UchastokNumber),
-            _ => patients.OrderBy(d => d.Id)
-        };
     }
 }

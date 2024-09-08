@@ -10,14 +10,22 @@ namespace TestTask.Api.Controllers
     public class PatientsController(IPatientService patientService, ILogger<PatientsController> logger) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PatientListDto>>> GetPatients([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "UchastokNumber")
+        public async Task<ActionResult<IEnumerable<PatientListDto>>> GetPatients(CancellationToken cancellationToken, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "UchastokNumber")
         {
             var validationResult = ValidationHelper.ValidatePageParameters(pageNumber, pageSize);
             if (validationResult != null)
                 return validationResult;
 
-            var patients = await patientService.GetPatientsAsync(pageNumber, pageSize, sortBy);
-            return Ok(patients);
+            try
+            {
+                var patients = await patientService.GetPatientsAsync(pageNumber, pageSize, sortBy, cancellationToken);
+                return Ok(patients);
+            }
+
+            catch (OperationCanceledException)
+            {
+                return NoContent();
+            }
         }
 
         [HttpGet("{id}")]
@@ -33,11 +41,11 @@ namespace TestTask.Api.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            
+
             try
             {
                 var createdPatientId = await patientService.CreatePatientAsync(patientDto);
-                return CreatedAtAction(nameof(GetPatient), new { id = createdPatientId }, new { id = createdPatientId});
+                return CreatedAtAction(nameof(GetPatient), new { id = createdPatientId }, new { id = createdPatientId });
             }
             catch (ArgumentException ex)
             {
@@ -68,7 +76,7 @@ namespace TestTask.Api.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An unexpected error occurred while updating patient with ID {PatientId}", patientDto.Id);
+                logger.LogError(ex, $"An unexpected error occurred while updating patient with ID {patientDto.Id}");
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -91,7 +99,7 @@ namespace TestTask.Api.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An unexpected error occurred while deleting patient with ID {id}", id);
+                logger.LogError(ex, $"An unexpected error occurred while deleting patient with ID {id}");
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
