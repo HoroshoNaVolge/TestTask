@@ -2,23 +2,41 @@
 using TestTask.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using TestTask.Domain.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace TestTask.Infrastructure.Repositories
 {
-    public class PatientRepository(ApplicationDbContext context) : IPatientRepository
+    public class PatientRepository(ApplicationDbContext context, IMemoryCache cache) : IPatientRepository
     {
+        private static readonly string PatientsCacheKey = "DoctorsCache";
+
         public async Task<IReadOnlyCollection<Patient>> GetAllAsync(int pageNumber, int pageSize, string sortBy, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+
+            var cacheKey = $"{PatientsCacheKey}_{pageNumber}_{pageSize}_{sortBy}";
+
+            if (cache.TryGetValue(cacheKey, out IReadOnlyCollection<Patient>? cachedPatients))
+                return cachedPatients!;
 
             IQueryable<Patient> query = context.Patients.Include(d => d.Uchastok);
 
             query = ApplySorting(query, sortBy);
 
-            return await query
+            var patients = await query
                .Skip((pageNumber - 1) * pageSize)
                .Take(pageSize)
                .ToListAsync(cancellationToken);
+
+            var cacheEntryOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
+                SlidingExpiration = TimeSpan.FromMinutes(5)
+            };
+
+            cache.Set(cacheKey, patients, cacheEntryOptions);
+
+            return patients;
         }
 
         public async Task<Patient?> GetByIdAsync(int id)

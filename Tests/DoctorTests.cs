@@ -51,14 +51,14 @@ namespace Tests
             new() { Id = 2, CabinetNumber = "102", SpecializationName = "Neurologist" }
         };
 
-            _doctorRepositoryMock.Setup(repo => repo.GetAllAsync(1, 10, "CabinetNumber")).ReturnsAsync(doctors);
+            _doctorRepositoryMock.Setup(repo => repo.GetAllAsync(1, 10, "CabinetNumber", CancellationToken.None)).ReturnsAsync(doctors);
             _mapperMock.Setup(mapper => mapper.Map<IEnumerable<DoctorListDto>>(It.IsAny<IEnumerable<Doctor>>()))
                        .Returns(doctorDtos);
 
-            var result = await _doctorService.GetDoctorsAsync(1, 10, "CabinetNumber");
+            var result = await _doctorService.GetDoctorsAsync(1, 10, "CabinetNumber", CancellationToken.None);
 
             Assert.Equal(doctorDtos[0].CabinetNumber, result.First().CabinetNumber);
-            _doctorRepositoryMock.Verify(repo => repo.GetAllAsync(1, 10, "CabinetNumber"), Times.Once);
+            _doctorRepositoryMock.Verify(repo => repo.GetAllAsync(1, 10, "CabinetNumber", CancellationToken.None), Times.Once);
             _mapperMock.Verify(mapper => mapper.Map<IEnumerable<DoctorListDto>>(doctors), Times.Once);
         }
     }
@@ -85,9 +85,9 @@ namespace Tests
             new() { Id = 2, CabinetNumber = "102", SpecializationName = "Neurologist" }
         };
 
-            _doctorServiceMock.Setup(service => service.GetDoctorsAsync(1, 10, "SpecializationName")).ReturnsAsync(doctorDtos);
+            _doctorServiceMock.Setup(service => service.GetDoctorsAsync(1, 10, "SpecializationName", CancellationToken.None)).ReturnsAsync(doctorDtos);
 
-            var result = await _controller.GetDoctors(1, 10, "SpecializationName");
+            var result = await _controller.GetDoctors(CancellationToken.None, 1, 10, "SpecializationName");
 
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             var returnedDoctors = Assert.IsType<List<DoctorListDto>>(okResult.Value);
