@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TestTask.Application.Interfaces;
 using TestTask.Application.DTOs;
-using TestTask.Api.Validation;
+using TestTask.Application.Validation;
 
 namespace TestTask.Api.Controllers
 {
@@ -10,7 +10,7 @@ namespace TestTask.Api.Controllers
     public class DoctorsController(IDoctorService doctorService, ILogger<DoctorsController> logger) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DoctorListDto>>> GetDoctors([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "SpecializationName")
+        public async Task<ActionResult<IEnumerable<DoctorListDto>>> GetDoctors([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "UchastokNumber")
         {
             var validationResult = ValidationHelper.ValidatePageParameters(pageNumber, pageSize);
             if (validationResult != null)
@@ -29,12 +29,12 @@ namespace TestTask.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateDoctor(DoctorEditDto doctorDto)
+        public async Task<ActionResult> CreateDoctor(DoctorCreateDto doctorDto)
         {
             try
             {
-                await doctorService.CreateDoctorAsync(doctorDto);
-                return CreatedAtAction(nameof(GetDoctor), new { id = doctorDto.Id }, doctorDto);
+                var createdDoctorId = await doctorService.CreateDoctorAsync(doctorDto);
+                return CreatedAtAction(nameof(GetDoctor), new { id = createdDoctorId }, new { id = createdDoctorId });
             }
             catch (ArgumentException ex)
             {
@@ -42,7 +42,7 @@ namespace TestTask.Api.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "An unexpected error occurred while creating doctor with ID {DoctorId}", doctorDto.Id);
+                logger.LogError(ex, "An unexpected error occurred while creating doctor");
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }

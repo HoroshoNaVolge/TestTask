@@ -2,7 +2,6 @@
 using TestTask.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using TestTask.Domain.Interfaces;
-using System.Globalization;
 
 namespace TestTask.Infrastructure.Repositories
 {
@@ -27,10 +26,11 @@ namespace TestTask.Infrastructure.Repositories
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task AddAsync(Patient patient)
+        public async Task<int> AddAsync(Patient patient)
         {
             context.Patients.Add(patient);
             await context.SaveChangesAsync();
+            return patient.Id;
         }
 
         public async Task UpdateAsync(Patient patient)

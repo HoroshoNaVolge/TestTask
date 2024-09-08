@@ -6,7 +6,7 @@ namespace TestTask.Application.Interfaces
     {
         Task<IEnumerable<DoctorListDto>> GetDoctorsAsync(int pageNumber, int pageSize, string sortBy);
         Task<DoctorEditDto> GetDoctorByIdAsync(int id);
-        Task CreateDoctorAsync(DoctorEditDto doctorDto);
+        Task<int> CreateDoctorAsync(DoctorCreateDto doctorDto);
         Task UpdateDoctorAsync(int id, DoctorEditDto doctorDto);
         Task DeleteDoctorAsync(int id);
     }

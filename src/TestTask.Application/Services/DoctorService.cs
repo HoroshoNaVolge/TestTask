@@ -28,13 +28,13 @@ namespace TestTask.Application.Services
             return mapper.Map<DoctorEditDto>(doctor);
         }
 
-        public async Task CreateDoctorAsync(DoctorEditDto doctorDto)
+        public async Task<int> CreateDoctorAsync(DoctorCreateDto doctorDto)
         {
             await TryValidateData(doctorDto);
 
             var doctor = mapper.Map<Doctor>(doctorDto);
 
-            await doctorRepository.AddAsync(doctor);
+            return await doctorRepository.AddAsync(doctor);
         }
 
         public async Task UpdateDoctorAsync(int id, DoctorEditDto doctorDto)
@@ -55,7 +55,7 @@ namespace TestTask.Application.Services
             await doctorRepository.DeleteAsync(id);
         }
 
-        private async Task TryValidateData(DoctorEditDto doctorDto)
+        private async Task TryValidateData(DoctorBaseDto doctorDto)
         {
             if (doctorDto.CabinetId != null && !await cabinetRepository.ExistsAsync(doctorDto.CabinetId.Value))
                 throw new ArgumentException("Cabinet with specified ID does not exist.");

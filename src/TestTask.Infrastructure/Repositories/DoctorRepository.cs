@@ -31,10 +31,11 @@ namespace TestTask.Infrastructure.Repositories
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
 
-        public async Task AddAsync(Doctor doctor)
+        public async Task<int> AddAsync(Doctor doctor)
         {
             context.Doctors.Add(doctor);
             await context.SaveChangesAsync();
+            return doctor.Id;
         }
 
         public async Task UpdateAsync(Doctor doctor)
