@@ -14,9 +14,11 @@ namespace TestTask.Application.Services
         IMapper mapper)
         : IDoctorService
     {
-        public async Task<IEnumerable<DoctorListDto>> GetDoctorsAsync(int pageNumber, int pageSize, string sortBy)
+        public async Task<IEnumerable<DoctorListDto>> GetDoctorsAsync(int pageNumber, int pageSize, string sortBy, CancellationToken cancellationToken)
         {
-            var doctors = await doctorRepository.GetAllAsync(pageNumber, pageSize, sortBy);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var doctors = await doctorRepository.GetAllAsync(pageNumber, pageSize, sortBy, cancellationToken);
 
             return mapper.Map<IEnumerable<DoctorListDto>>(doctors);
         }

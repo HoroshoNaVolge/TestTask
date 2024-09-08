@@ -2,13 +2,16 @@
 using TestTask.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using TestTask.Domain.Interfaces;
+using System.Threading;
 
 namespace TestTask.Infrastructure.Repositories
 {
     public class DoctorRepository(ApplicationDbContext context) : IDoctorRepository
     {
-        public async Task<IEnumerable<Doctor>> GetAllAsync(int pageNumber, int pageSize, string sortBy)
+        public async Task<IReadOnlyCollection<Doctor>> GetAllAsync(int pageNumber, int pageSize, string sortBy, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             IQueryable<Doctor> query = context.Doctors
                 .Include(d => d.Uchastok)
                 .Include(d => d.Cabinet)
@@ -19,7 +22,7 @@ namespace TestTask.Infrastructure.Repositories
             return await query
                .Skip((pageNumber - 1) * pageSize)
                .Take(pageSize)
-               .ToListAsync();
+               .ToListAsync(cancellationToken);
         }
 
         public async Task<Doctor?> GetByIdAsync(int id)

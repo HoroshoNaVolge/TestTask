@@ -4,7 +4,7 @@ namespace TestTask.Application.Interfaces
 {
     public interface IPatientService
     {
-        Task<IEnumerable<PatientListDto>> GetPatientsAsync(int pageNumber, int pageSize, string sortBy);
+        Task<IEnumerable<PatientListDto>> GetPatientsAsync(int pageNumber, int pageSize, string sortBy, CancellationToken cancellationToken);
         Task<PatientEditDto> GetPatientByIdAsync(int id);
         Task<int> CreatePatientAsync(PatientCreateDto patientDto);
         Task UpdatePatientAsync(int id, PatientEditDto patientDto);

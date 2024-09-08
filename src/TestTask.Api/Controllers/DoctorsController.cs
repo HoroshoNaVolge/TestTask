@@ -10,14 +10,21 @@ namespace TestTask.Api.Controllers
     public class DoctorsController(IDoctorService doctorService, ILogger<DoctorsController> logger) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DoctorListDto>>> GetDoctors([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "UchastokNumber")
+        public async Task<ActionResult<IEnumerable<DoctorListDto>>> GetDoctors(CancellationToken cancellationToken, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "UchastokNumber")
         {
             var validationResult = ValidationHelper.ValidatePageParameters(pageNumber, pageSize);
             if (validationResult != null)
                 return validationResult;
-            
-            var doctors = await doctorService.GetDoctorsAsync(pageNumber, pageSize, sortBy);
-            return Ok(doctors);
+
+            try
+            {
+                var doctors = await doctorService.GetDoctorsAsync(pageNumber, pageSize, sortBy, cancellationToken);
+                return Ok(doctors);
+            }
+            catch (OperationCanceledException)
+            {
+                return NoContent();
+            }
         }
 
         [HttpGet("{id}")]

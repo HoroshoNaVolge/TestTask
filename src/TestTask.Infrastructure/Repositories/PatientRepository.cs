@@ -7,8 +7,10 @@ namespace TestTask.Infrastructure.Repositories
 {
     public class PatientRepository(ApplicationDbContext context) : IPatientRepository
     {
-        public async Task<IEnumerable<Patient>> GetAllAsync(int pageNumber, int pageSize, string sortBy)
+        public async Task<IReadOnlyCollection<Patient>> GetAllAsync(int pageNumber, int pageSize, string sortBy, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             IQueryable<Patient> query = context.Patients.Include(d => d.Uchastok);
 
             query = ApplySorting(query, sortBy);
@@ -16,7 +18,7 @@ namespace TestTask.Infrastructure.Repositories
             return await query
                .Skip((pageNumber - 1) * pageSize)
                .Take(pageSize)
-               .ToListAsync();
+               .ToListAsync(cancellationToken);
         }
 
         public async Task<Patient?> GetByIdAsync(int id)
