@@ -5,15 +5,20 @@ using TestTask.Application.Validation;
 namespace TestTask.Api.Controllers
 {
     [ApiController]
-    public abstract class BaseController<TListDto, TEditDto, TCreateDto, TEntity>
-        (IBaseService<TListDto, TEditDto, TCreateDto, TEntity> service, ILogger logger) 
+    public abstract class BaseController<TListDto, TEditDto, TBaseDto, TEntity>(
+        IBaseService<TListDto, TEditDto, TBaseDto, TEntity> service,
+        ILogger logger)
         : ControllerBase
     {
-        protected readonly IBaseService<TListDto, TEditDto, TCreateDto, TEntity> service = service;
+        protected readonly IBaseService<TListDto, TEditDto, TBaseDto, TEntity> service = service;
         protected readonly ILogger logger = logger;
 
         [HttpGet]
-        public virtual async Task<ActionResult<IEnumerable<TListDto>>> GetAll(CancellationToken cancellationToken, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "UchastokNumber")
+        public virtual async Task<ActionResult<IEnumerable<TListDto>>> GetAll(
+            CancellationToken cancellationToken,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string sortBy = "UchastokNumber")
         {
             ValidationHelper.ValidatePageParameters(pageNumber, pageSize);
 
@@ -28,7 +33,7 @@ namespace TestTask.Api.Controllers
         }
 
         [HttpPost]
-        public virtual async Task<ActionResult> Create(TCreateDto createDto)
+        public virtual async Task<ActionResult> Create(TBaseDto createDto)
         {
             var createdId = await service.CreateAsync(createDto);
             return CreatedAtAction(nameof(GetById), new { id = createdId }, new { id = createdId });

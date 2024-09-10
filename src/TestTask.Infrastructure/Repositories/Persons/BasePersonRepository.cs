@@ -9,10 +9,13 @@ namespace TestTask.Infrastructure.Repositories.Persons
 {
     public abstract class BasePersonRepository<TEntity>(ApplicationDbContext context, IMemoryCache cache) : IPersonRepository<TEntity> where TEntity : class, IEntity
     {
-        protected readonly ApplicationDbContext context = context ?? throw new ArgumentNullException(nameof(context));
-        protected readonly IMemoryCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
         private static readonly object cacheLock = new();
         private static readonly ConcurrentDictionary<string, bool> cacheKeys = [];
+
+        protected readonly ApplicationDbContext context = context ?? throw new ArgumentNullException(nameof(context));
+        protected readonly IMemoryCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        protected abstract string CacheKeyPrefix { get; }
+
 
         public async Task<IReadOnlyCollection<TEntity>> GetAllAsync(int pageNumber, int pageSize, string sortBy, CancellationToken cancellationToken)
         {
@@ -79,7 +82,11 @@ namespace TestTask.Infrastructure.Repositories.Persons
 
         protected abstract IQueryable<TEntity> ApplyIncludes(IQueryable<TEntity> query);
         protected abstract IQueryable<TEntity> ApplySorting(IQueryable<TEntity> query, string sortBy);
-        protected abstract string GetCacheKey(int pageNumber, int pageSize, string sortBy);
+
+        protected virtual string GetCacheKey(int pageNumber, int pageSize, string sortBy)
+        {
+            return $"{CacheKeyPrefix}_{pageNumber}_{pageSize}_{sortBy}";
+        }
 
         private void ClearCache()
         {

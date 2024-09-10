@@ -6,7 +6,9 @@ using TestTask.Domain.Entities.Persons;
 namespace TestTask.Api.Controllers
 {
     [Route("api/[controller]")]
-    public class PatientsController(IBaseService<PatientListDto, PatientEditDto, PatientBaseDto, Patient> patientService, ILogger<PatientsController> logger)
+    public class PatientsController(
+        IBaseService<PatientListDto, PatientEditDto, PatientBaseDto, Patient> patientService,
+        ILogger<PatientsController> logger)
         : BaseController<PatientListDto, PatientEditDto, PatientBaseDto, Patient>(patientService, logger)
     {
     }

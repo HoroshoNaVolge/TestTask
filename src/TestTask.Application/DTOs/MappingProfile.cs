@@ -41,7 +41,6 @@ namespace TestTask.Application.DTOs
                 .ForMember(dest => dest.UchastokId, opt => opt.MapFrom(src => src.UchastokId));
 
             CreateMap<Patient, PatientListDto>()
-                .ForMember(dest => dest.UchastokNumber, opt => opt.MapFrom(src => src.Uchastok!.Number))
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
                 .ForMember(dest => dest.MiddleName, opt => opt.MapFrom(src => src.MiddleName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))

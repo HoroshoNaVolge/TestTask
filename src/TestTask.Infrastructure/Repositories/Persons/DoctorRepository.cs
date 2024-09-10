@@ -8,6 +8,7 @@ namespace TestTask.Infrastructure.Repositories.Persons
     public class DoctorRepository(ApplicationDbContext context, IMemoryCache cache) : BasePersonRepository<Doctor>(context, cache)
     {
         private static readonly string DoctorsCacheKeyPrefix = "DoctorsCache";
+        protected override string CacheKeyPrefix => DoctorsCacheKeyPrefix;
 
         protected override IQueryable<Doctor> ApplyIncludes(IQueryable<Doctor> query)
         {
@@ -26,11 +27,6 @@ namespace TestTask.Infrastructure.Repositories.Persons
                 "UchastokNumber" => query.OrderBy(d => d.Uchastok!.Number),
                 _ => query.OrderBy(d => d.Id)
             };
-        }
-
-        protected override string GetCacheKey(int pageNumber, int pageSize, string sortBy)
-        {
-            return $"{DoctorsCacheKeyPrefix}_{pageNumber}_{pageSize}_{sortBy}";
         }
     }
 }
