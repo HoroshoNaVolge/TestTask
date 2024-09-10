@@ -61,14 +61,14 @@ namespace TestTask.Api.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdatePatient(int id, PatientEditDto patientDto)
         {
-            var existingpatient = await patientService.GetPatientByIdAsync(id);
-            if (existingpatient == null)
-                return NotFound();
-
             try
             {
                 await patientService.UpdatePatientAsync(id, patientDto);
                 return Ok();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
             catch (ArgumentException ex)
             {
