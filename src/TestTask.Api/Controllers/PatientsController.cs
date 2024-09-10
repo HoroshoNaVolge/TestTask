@@ -2,12 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using TestTask.Application.Interfaces;
 using TestTask.Application.DTOs;
 using TestTask.Application.Validation;
+using TestTask.Domain.Entities.Persons;
 
 namespace TestTask.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PatientsController(IPatientService patientService, ILogger<PatientsController> logger) : ControllerBase
+    public class PatientsController(IBaseService<PatientListDto, PatientEditDto, PatientCreateDto, Patient> patientService, ILogger<PatientsController> logger) : ControllerBase
     {
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PatientListDto>>> GetPatients(CancellationToken cancellationToken, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "UchastokNumber")
@@ -18,7 +19,7 @@ namespace TestTask.Api.Controllers
 
             try
             {
-                var patients = await patientService.GetPatientsAsync(pageNumber, pageSize, sortBy, cancellationToken);
+                var patients = await patientService.GetAllAsync(pageNumber, pageSize, sortBy, cancellationToken);
                 return Ok(patients);
             }
 
@@ -31,7 +32,7 @@ namespace TestTask.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<PatientEditDto>> GetPatient(int id)
         {
-            var patient = await patientService.GetPatientByIdAsync(id);
+            var patient = await patientService.GetByIdAsync(id);
             if (patient == null) return NotFound();
             return Ok(patient);
         }
@@ -44,7 +45,7 @@ namespace TestTask.Api.Controllers
 
             try
             {
-                var createdPatientId = await patientService.CreatePatientAsync(patientDto);
+                var createdPatientId = await patientService.CreateAsync(patientDto);
                 return CreatedAtAction(nameof(GetPatient), new { id = createdPatientId }, new { id = createdPatientId });
             }
             catch (ArgumentException ex)
@@ -63,7 +64,7 @@ namespace TestTask.Api.Controllers
         {
             try
             {
-                await patientService.UpdatePatientAsync(id, patientDto);
+                await patientService.UpdateAsync(id, patientDto);
                 return Ok();
             }
             catch (KeyNotFoundException ex)
@@ -84,13 +85,13 @@ namespace TestTask.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeletePatient(int id)
         {
-            var existingpatient = await patientService.GetPatientByIdAsync(id);
+            var existingpatient = await patientService.GetByIdAsync(id);
             if (existingpatient == null)
                 return NotFound();
 
             try
             {
-                await patientService.DeletePatientAsync(id);
+                await patientService.DeleteAsync(id);
                 return Ok();
             }
             catch (ArgumentException ex)
