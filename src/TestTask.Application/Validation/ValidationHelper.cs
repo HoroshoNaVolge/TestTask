@@ -5,15 +5,13 @@ namespace TestTask.Application.Validation
 {
     public static class ValidationHelper
     {
-        public static ActionResult ValidatePageParameters(int pageNumber, int pageSize)
+        public static void ValidatePageParameters(int pageNumber, int pageSize)
         {
             if (pageNumber <= 0)
-                return new BadRequestObjectResult("Page number must be greater than zero.");
+                throw new ArgumentException("Page number must be greater than zero.");
 
             if (pageSize <= 0)
-                return new BadRequestObjectResult("Page size must be greater than zero.");
-            
-            return null!;
+                throw new ArgumentException("Page size must be greater than zero.");
         }
 
         public class ValidDateAttribute : ValidationAttribute

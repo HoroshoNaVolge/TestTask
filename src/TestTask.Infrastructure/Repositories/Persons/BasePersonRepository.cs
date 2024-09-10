@@ -70,14 +70,12 @@ namespace TestTask.Infrastructure.Repositories.Persons
 
         public async Task DeleteAsync(int id)
         {
-            var entity = await context.Set<TEntity>().FindAsync(id);
-            if (entity != null)
-            {
-                context.Set<TEntity>().Remove(entity);
-                await context.SaveChangesAsync();
+            var entity = await context.Set<TEntity>().FindAsync(id) ?? throw new KeyNotFoundException($"{typeof(TEntity).Name} not found");
+            context.Set<TEntity>().Remove(entity);
+            await context.SaveChangesAsync();
 
-                ClearCache();
-            }
+            ClearCache();
+
         }
 
         protected abstract IQueryable<TEntity> ApplyIncludes(IQueryable<TEntity> query);

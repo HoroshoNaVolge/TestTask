@@ -5,23 +5,17 @@ using TestTask.Application.Validation;
 namespace TestTask.Api.Controllers
 {
     [ApiController]
-    public abstract class BaseController<TListDto, TEditDto, TCreateDto, TEntity> : ControllerBase
+    public abstract class BaseController<TListDto, TEditDto, TCreateDto, TEntity>
+        (IBaseService<TListDto, TEditDto, TCreateDto, TEntity> service, ILogger logger) 
+        : ControllerBase
     {
-        protected readonly IBaseService<TListDto, TEditDto, TCreateDto, TEntity> service;
-        protected readonly ILogger logger;
-
-        public BaseController(IBaseService<TListDto, TEditDto, TCreateDto, TEntity> service, ILogger logger)
-        {
-            this.service = service;
-            this.logger = logger;
-        }
+        protected readonly IBaseService<TListDto, TEditDto, TCreateDto, TEntity> service = service;
+        protected readonly ILogger logger = logger;
 
         [HttpGet]
         public virtual async Task<ActionResult<IEnumerable<TListDto>>> GetAll(CancellationToken cancellationToken, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortBy = "UchastokNumber")
         {
-            var validationResult = ValidationHelper.ValidatePageParameters(pageNumber, pageSize);
-            if (validationResult != null)
-                return validationResult;
+            ValidationHelper.ValidatePageParameters(pageNumber, pageSize);
 
             var entities = await service.GetAllAsync(pageNumber, pageSize, sortBy, cancellationToken);
             return Ok(entities);
