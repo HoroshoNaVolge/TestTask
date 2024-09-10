@@ -19,7 +19,7 @@ namespace TestTask.Application.Services
 
         public virtual async Task<TEntityEditDto> GetByIdAsync(int id)
         {
-            var entity = await Repository.GetByIdAsync(id) ?? throw new KeyNotFoundException($"{typeof(TEntity).Name} not found");
+            var entity = await GetEntityFromRepository(id);
             return Mapper.Map<TEntityEditDto>(entity);
         }
 
@@ -31,7 +31,7 @@ namespace TestTask.Application.Services
 
         public virtual async Task UpdateAsync(int id, TEntityEditDto dto)
         {
-            var entity = await Repository.GetByIdAsync(id) ?? throw new KeyNotFoundException($"{typeof(TEntity).Name} not found");
+            var entity = await GetEntityFromRepository(id);
             Mapper.Map(dto, entity);
             await Repository.UpdateAsync(entity);
         }
@@ -39,6 +39,11 @@ namespace TestTask.Application.Services
         public virtual async Task DeleteAsync(int id)
         {
             await Repository.DeleteAsync(id);
+        }
+
+        public async Task<TEntity> GetEntityFromRepository(int id)
+        {
+            return await Repository.GetByIdAsync(id) ?? throw new KeyNotFoundException($"{typeof(TEntity).Name} not found");
         }
     }
 }

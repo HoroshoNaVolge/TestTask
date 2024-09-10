@@ -25,7 +25,8 @@ namespace TestTask.Application.DTOs
             CreateMap<DoctorEditDto, Doctor>()
                 .ForMember(dest => dest.CabinetId, opt => opt.MapFrom(src => src.CabinetId))
                 .ForMember(dest => dest.SpecializationId, opt => opt.MapFrom(src => src.SpecializationId))
-                .ForMember(dest => dest.UchastokId, opt => opt.MapFrom(src => src.UchastokId));
+                .ForMember(dest => dest.UchastokId, opt => opt.MapFrom(src => src.UchastokId))
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
 
             CreateMap<DoctorCreateDto, Doctor>()
                 .ForMember(dest => dest.CabinetId, opt => opt.MapFrom(src => src.CabinetId))
@@ -43,7 +44,8 @@ namespace TestTask.Application.DTOs
                 .ForMember(dest => dest.UchastokId, opt => opt.MapFrom(src => src.UchastokId));
 
             CreateMap<PatientEditDto, Patient>()
-                .ForMember(dest => dest.UchastokId, opt => opt.MapFrom(src => src.UchastokId));
+                .ForMember(dest => dest.UchastokId, opt => opt.MapFrom(src => src.UchastokId))
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
 
             CreateMap<PatientCreateDto, Patient>()
                 .ForMember(dest => dest.UchastokId, opt => opt.MapFrom(src => src.UchastokId))

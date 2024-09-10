@@ -60,7 +60,7 @@ namespace TestTask.Infrastructure.Repositories.Persons
             return entity.Id;
         }
 
-        public async Task UpdateAsync(TEntity entity)
+        public virtual async Task UpdateAsync(TEntity entity)
         {
             context.Set<TEntity>().Update(entity);
             await context.SaveChangesAsync();
@@ -84,7 +84,7 @@ namespace TestTask.Infrastructure.Repositories.Persons
         protected abstract IQueryable<TEntity> ApplySorting(IQueryable<TEntity> query, string sortBy);
         protected abstract string GetCacheKey(int pageNumber, int pageSize, string sortBy);
 
-        private void ClearCache()
+        private void ClearCache() // оставляем нестатическим для избежания потенциальных проблем при нескольких потоках.
         {
             lock (cacheLock)
             {

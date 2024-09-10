@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TestTask.Api.Middleware;
 using TestTask.Application.DTOs;
 using TestTask.Application.Interfaces;
 using TestTask.Application.Services;
@@ -52,6 +53,8 @@ namespace TestTask.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseHttpsRedirection();
 
