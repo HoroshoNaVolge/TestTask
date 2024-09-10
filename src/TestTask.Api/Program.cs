@@ -35,8 +35,8 @@ namespace TestTask.Api
             builder.Services.AddScoped<ICommonRepository<Specialization>, SpecializationRepository>();
             builder.Services.AddScoped<ICommonRepository<Cabinet>, CabinetRepository>();
 
-            builder.Services.AddScoped<IBaseService<PatientListDto, PatientEditDto, PatientCreateDto, Patient>, PatientService>();
-            builder.Services.AddScoped<IBaseService<DoctorListDto, DoctorEditDto, DoctorCreateDto, Doctor>, DoctorService>();
+            builder.Services.AddScoped<IBaseService<PatientListDto, PatientEditDto, PatientBaseDto, Patient>, PatientService>();
+            builder.Services.AddScoped<IBaseService<DoctorListDto, DoctorEditDto, DoctorBaseDto, Doctor>, DoctorService>();
 
             builder.Services.AddMemoryCache();
 

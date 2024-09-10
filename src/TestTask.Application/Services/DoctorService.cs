@@ -12,7 +12,7 @@ namespace TestTask.Application.Services
     ICommonRepository<Cabinet> cabinetRepository,
     ICommonRepository<Specialization> specializationRepository,
     ICommonRepository<Uchastok> uchastokRepository,
-    IMapper mapper) : BaseService<DoctorListDto, DoctorEditDto, DoctorCreateDto, Doctor>(doctorRepository, mapper)
+    IMapper mapper) : BaseService<DoctorListDto, DoctorEditDto, DoctorBaseDto, Doctor>(doctorRepository, mapper)
     {
         private async Task TryValidateData(DoctorBaseDto doctorDto)
         {
@@ -26,7 +26,7 @@ namespace TestTask.Application.Services
                 throw new ArgumentException("Uchastok with specified ID does not exist.");
         }
 
-        public override async Task<int> CreateAsync(DoctorCreateDto dto)
+        public override async Task<int> CreateAsync(DoctorBaseDto dto)
         {
             await TryValidateData(dto);
             return await base.CreateAsync(dto);

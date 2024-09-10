@@ -66,12 +66,12 @@ namespace Tests
 
     public class DoctorsControllerTests
     {
-        private readonly Mock<IBaseService<DoctorListDto, DoctorEditDto, DoctorCreateDto, Doctor>> _doctorServiceMock;
+        private readonly Mock<IBaseService<DoctorListDto, DoctorEditDto, DoctorBaseDto, Doctor>> _doctorServiceMock;
         private readonly DoctorsController _controller;
 
         public DoctorsControllerTests()
         {
-            _doctorServiceMock = new Mock<IBaseService<DoctorListDto, DoctorEditDto, DoctorCreateDto, Doctor>>();
+            _doctorServiceMock = new Mock<IBaseService<DoctorListDto, DoctorEditDto, DoctorBaseDto, Doctor>>();
             _controller = new DoctorsController(_doctorServiceMock.Object, logger: null!);
         }
 

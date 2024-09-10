@@ -4,8 +4,8 @@ using TestTask.Domain.Interfaces.Persons;
 
 namespace TestTask.Application.Services
 {
-    public abstract class BaseService<TEntityListDto, TEntityEditDto, TEntityCreateDto, TEntity>(IPersonRepository<TEntity> repository, IMapper mapper)
-                                     : IBaseService<TEntityListDto, TEntityEditDto, TEntityCreateDto, TEntity> where TEntity : class
+    public abstract class BaseService<TEntityListDto, TEntityEditDto, TEntityBaseDto, TEntity>(IPersonRepository<TEntity> repository, IMapper mapper)
+                                     : IBaseService<TEntityListDto, TEntityEditDto, TEntityBaseDto, TEntity> where TEntity : class
     {
         protected readonly IPersonRepository<TEntity> Repository = repository;
         protected readonly IMapper Mapper = mapper;
@@ -23,7 +23,7 @@ namespace TestTask.Application.Services
             return Mapper.Map<TEntityEditDto>(entity);
         }
 
-        public virtual async Task<int> CreateAsync(TEntityCreateDto dto)
+        public virtual async Task<int> CreateAsync(TEntityBaseDto dto)
         {
             var entity = Mapper.Map<TEntity>(dto);
             return await Repository.AddAsync(entity);
