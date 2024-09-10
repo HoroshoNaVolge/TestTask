@@ -1,23 +1,25 @@
 using Moq;
 using TestTask.Application.Services;
-using TestTask.Domain.Entities;
 using TestTask.Application.DTOs;
 using AutoMapper;
-using TestTask.Domain.Interfaces;
+using TestTask.Domain.Interfaces.Common;
+using TestTask.Domain.Entities.Persons;
+using TestTask.Domain.Interfaces.Persons;
+using TestTask.Domain.Entities.Other;
 
 namespace Tests
 {
     public class PatientServiceTests
     {
-        private readonly Mock<IPatientRepository> _patientRepositoryMock;
-        private readonly Mock<IUchastokRepository> _uchastokRepositoryMock;
+        private readonly Mock<IPersonRepository<Patient>> _patientRepositoryMock;
+        private readonly Mock<ICommonRepository<Uchastok>> _uchastokRepositoryMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly PatientService _patientService;
 
         public PatientServiceTests()
         {
-            _patientRepositoryMock = new Mock<IPatientRepository>();
-            _uchastokRepositoryMock = new Mock<IUchastokRepository>();
+            _patientRepositoryMock = new Mock<IPersonRepository<Patient>>();
+            _uchastokRepositoryMock = new Mock<ICommonRepository<Uchastok>>();
             _mapperMock = new Mock<IMapper>();
 
             _patientService = new PatientService(
@@ -41,11 +43,11 @@ namespace Tests
             new() { Id = 2, UchastokNumber = "002" }
         };
 
-            _patientRepositoryMock.Setup(repo => repo.GetAllAsync(1, 10, "UchastokNumber",CancellationToken.None)).ReturnsAsync(patients);
+            _patientRepositoryMock.Setup(repo => repo.GetAllAsync(1, 10, "UchastokNumber", CancellationToken.None)).ReturnsAsync(patients);
             _mapperMock.Setup(mapper => mapper.Map<IEnumerable<PatientListDto>>(It.IsAny<IEnumerable<Patient>>()))
                        .Returns(patientDtos);
 
-            var result = await _patientService.GetPatientsAsync(1, 10, "UchastokNumber", CancellationToken.None);
+            var result = await _patientService.GetAllAsync(1, 10, "UchastokNumber", CancellationToken.None);
 
             Assert.Equal(patientDtos[0].UchastokNumber, result.First().UchastokNumber);
             _patientRepositoryMock.Verify(repo => repo.GetAllAsync(1, 10, "UchastokNumber", CancellationToken.None), Times.Once);
@@ -61,7 +63,7 @@ namespace Tests
             _patientRepositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(patient);
             _mapperMock.Setup(mapper => mapper.Map<PatientEditDto>(It.IsAny<Patient>())).Returns(patientDto);
 
-            var result = await _patientService.GetPatientByIdAsync(1);
+            var result = await _patientService.GetByIdAsync(1);
 
             Assert.Equal(patientDto.Id, result.Id);
             _patientRepositoryMock.Verify(repo => repo.GetByIdAsync(1), Times.Once);
@@ -71,11 +73,10 @@ namespace Tests
         [Fact]
         public async Task GetPatientByIdAsync_ReturnsNull_WhenPatientDoesNotExist()
         {
-            _patientRepositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync((Patient)null!);
+            _patientRepositoryMock.Setup(repo => repo.GetByIdAsync(1)).ThrowsAsync(new KeyNotFoundException());
+            
+            await Assert.ThrowsAsync<KeyNotFoundException>(() => _patientService.GetByIdAsync(1));
 
-            var result = await _patientService.GetPatientByIdAsync(1);
-
-            Assert.Null(result);
             _patientRepositoryMock.Verify(repo => repo.GetByIdAsync(1), Times.Once);
         }
 
@@ -93,12 +94,12 @@ namespace Tests
                                                      .ReturnsAsync(expectedId);
 
 
-            var resultId = await _patientService.CreatePatientAsync(patientDto);
+            var resultId = await _patientService.CreateAsync(patientDto);
 
             _uchastokRepositoryMock.Verify(repo => repo.ExistsAsync(patientDto.UchastokId.Value), Times.Once);
             _mapperMock.Verify(mapper => mapper.Map<Patient>(patientDto), Times.Once);
             _patientRepositoryMock.Verify(repo => repo.AddAsync(patient), Times.Once);
-            
+
             Assert.Equal(expectedId, resultId);
         }
 
@@ -110,7 +111,7 @@ namespace Tests
             _patientRepositoryMock.Setup(repo => repo.GetByIdAsync(1)).ReturnsAsync(existingPatient);
             _patientRepositoryMock.Setup(repo => repo.DeleteAsync(existingPatient.Id)).Returns(Task.CompletedTask);
 
-            await _patientService.DeletePatientAsync(1);
+            await _patientService.DeleteAsync(1);
 
             _patientRepositoryMock.Verify(repo => repo.DeleteAsync(existingPatient.Id), Times.Once);
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TestTask.Domain.Entities;
+using TestTask.Domain.Entities.Other;
+using TestTask.Domain.Entities.Persons;
 
 namespace TestTask.Infrastructure.Data
 {
