@@ -3,18 +3,22 @@ using TestTask.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using TestTask.Domain.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Primitives;
 
 namespace TestTask.Infrastructure.Repositories
 {
     public class DoctorRepository(ApplicationDbContext context, IMemoryCache cache) : IDoctorRepository
     {
-        private static readonly string DoctorsCacheKey = "DoctorsCache";
+        private static readonly string DoctorsCacheKeyPrefix = "DoctorsCache";
+        private static readonly object cacheLock = new();
+        private static CancellationTokenSource resetCacheToken = new();
+
 
         public async Task<IReadOnlyCollection<Doctor>> GetAllAsync(int pageNumber, int pageSize, string sortBy, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var cacheKey = $"{DoctorsCacheKey}_{pageNumber}_{pageSize}_{sortBy}";
+            var cacheKey = $"{DoctorsCacheKeyPrefix}_{pageNumber}_{pageSize}_{sortBy}";
 
             if (cache.TryGetValue(cacheKey, out IReadOnlyCollection<Doctor>? cachedDoctors))
                 return cachedDoctors!;
@@ -34,7 +38,8 @@ namespace TestTask.Infrastructure.Repositories
             var cacheEntryOptions = new MemoryCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
-                SlidingExpiration = TimeSpan.FromMinutes(5)
+                SlidingExpiration = TimeSpan.FromMinutes(5),
+                ExpirationTokens = { new CancellationChangeToken(resetCacheToken.Token) }
             };
 
             cache.Set(cacheKey, doctors, cacheEntryOptions);
@@ -55,8 +60,8 @@ namespace TestTask.Infrastructure.Repositories
         {
             context.Doctors.Add(doctor);
             await context.SaveChangesAsync();
-           
-            cache.Remove(DoctorsCacheKey);
+
+            ClearCache();
 
             return doctor.Id;
         }
@@ -66,7 +71,7 @@ namespace TestTask.Infrastructure.Repositories
             context.Doctors.Update(doctor);
             await context.SaveChangesAsync();
 
-            cache.Remove(DoctorsCacheKey);
+            ClearCache();
         }
 
         public async Task DeleteAsync(int id)
@@ -76,8 +81,8 @@ namespace TestTask.Infrastructure.Repositories
             {
                 context.Doctors.Remove(doctor);
                 await context.SaveChangesAsync();
-                
-                cache.Remove(DoctorsCacheKey);
+
+                ClearCache();
             }
         }
 
@@ -90,6 +95,19 @@ namespace TestTask.Infrastructure.Repositories
                 "UchastokNumber" => query.OrderBy(d => d.Uchastok!.Number),
                 _ => query.OrderBy(d => d.Id)
             };
+        }
+
+        private static void ClearCache()
+        {
+            lock (cacheLock)
+            {
+                if (resetCacheToken != null && !resetCacheToken.IsCancellationRequested)
+                    resetCacheToken.Cancel();
+                
+                var newTokenSource = new CancellationTokenSource();
+                resetCacheToken?.Dispose();
+                resetCacheToken = newTokenSource;
+            }
         }
     }
 }

@@ -3,18 +3,21 @@ using TestTask.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using TestTask.Domain.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Primitives;
 
 namespace TestTask.Infrastructure.Repositories
 {
     public class PatientRepository(ApplicationDbContext context, IMemoryCache cache) : IPatientRepository
     {
-        private static readonly string PatientsCacheKey = "DoctorsCache";
+        private static readonly string PatientsCacheKeyPrefix = "PatientsCache";
+        private static readonly object cacheLock = new();
+        private static CancellationTokenSource resetCacheToken = new();
 
         public async Task<IReadOnlyCollection<Patient>> GetAllAsync(int pageNumber, int pageSize, string sortBy, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var cacheKey = $"{PatientsCacheKey}_{pageNumber}_{pageSize}_{sortBy}";
+            var cacheKey = $"{PatientsCacheKeyPrefix}_{pageNumber}_{pageSize}_{sortBy}";
 
             if (cache.TryGetValue(cacheKey, out IReadOnlyCollection<Patient>? cachedPatients))
                 return cachedPatients!;
@@ -31,7 +34,8 @@ namespace TestTask.Infrastructure.Repositories
             var cacheEntryOptions = new MemoryCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
-                SlidingExpiration = TimeSpan.FromMinutes(5)
+                SlidingExpiration = TimeSpan.FromMinutes(5),
+                ExpirationTokens = { new CancellationChangeToken(resetCacheToken.Token) }
             };
 
             cache.Set(cacheKey, patients, cacheEntryOptions);
@@ -50,6 +54,9 @@ namespace TestTask.Infrastructure.Repositories
         {
             context.Patients.Add(patient);
             await context.SaveChangesAsync();
+            
+            ClearCache();
+
             return patient.Id;
         }
 
@@ -57,6 +64,8 @@ namespace TestTask.Infrastructure.Repositories
         {
             context.Patients.Update(patient);
             await context.SaveChangesAsync();
+
+            ClearCache();
         }
 
         public async Task DeleteAsync(int id)
@@ -66,6 +75,8 @@ namespace TestTask.Infrastructure.Repositories
             {
                 context.Patients.Remove(patient);
                 await context.SaveChangesAsync();
+
+                ClearCache();
             }
         }
 
@@ -76,6 +87,19 @@ namespace TestTask.Infrastructure.Repositories
                 "UchastokNumber" => query.OrderBy(p => p.Uchastok!.Number),
                 _ => query.OrderBy(p => p.Id)
             };
+        }
+
+        private static void ClearCache()
+        {
+            lock (cacheLock)
+            {
+                if (resetCacheToken != null && !resetCacheToken.IsCancellationRequested)
+                    resetCacheToken.Cancel();
+
+                var newTokenSource = new CancellationTokenSource();
+                resetCacheToken?.Dispose();
+                resetCacheToken = newTokenSource;
+            }
         }
     }
 }
