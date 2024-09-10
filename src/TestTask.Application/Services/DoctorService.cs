@@ -1,16 +1,18 @@
 ﻿using TestTask.Application.Interfaces;
 using TestTask.Application.DTOs;
-using TestTask.Domain.Entities;
 using AutoMapper;
-using TestTask.Domain.Interfaces;
+using TestTask.Domain.Interfaces.Common;
+using TestTask.Domain.Interfaces.Persons;
+using TestTask.Domain.Entities.Persons;
+using TestTask.Domain.Entities.Other;
 
 namespace TestTask.Application.Services
 {
     public class DoctorService(
-        IDoctorRepository doctorRepository,
-        ICabinetRepository cabinetRepository,
-        ISpecializationRepository specializationRepository,
-        IUchastokRepository uchastokRepository,
+        IPersonRepository<Doctor> doctorRepository,
+        ICommonRepository<Cabinet> cabinetRepository,
+        ICommonRepository<Specialization> specializationRepository,
+        ICommonRepository<Uchastok> uchastokRepository,
         IMapper mapper)
         : IDoctorService
     {

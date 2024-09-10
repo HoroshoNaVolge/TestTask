@@ -2,9 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using TestTask.Application.DTOs;
 using TestTask.Application.Interfaces;
 using TestTask.Application.Services;
-using TestTask.Domain.Interfaces;
+using TestTask.Domain.Entities.Other;
+using TestTask.Domain.Entities.Persons;
+using TestTask.Domain.Interfaces.Common;
+using TestTask.Domain.Interfaces.Persons;
 using TestTask.Infrastructure.Data;
-using TestTask.Infrastructure.Repositories;
+using TestTask.Infrastructure.Repositories.Other;
+using TestTask.Infrastructure.Repositories.Persons;
 
 namespace TestTask.Api
 {
@@ -22,12 +26,13 @@ namespace TestTask.Api
 
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
- 
-            builder.Services.AddScoped<IPatientRepository, PatientRepository>();
-            builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
-            builder.Services.AddScoped<IUchastokRepository, UchastokRepository>();
-            builder.Services.AddScoped<ISpecializationRepository, SpecializationRepository>();
-            builder.Services.AddScoped<ICabinetRepository, CabinetRepository>();
+
+            builder.Services.AddScoped<IPersonRepository<Doctor>, DoctorRepository>();
+            builder.Services.AddScoped<IPersonRepository<Patient>, PatientRepository>();
+
+            builder.Services.AddScoped<ICommonRepository<Uchastok>, UchastokRepository>();
+            builder.Services.AddScoped<ICommonRepository<Specialization>, SpecializationRepository>();
+            builder.Services.AddScoped<ICommonRepository<Cabinet>, CabinetRepository>();
 
             builder.Services.AddScoped<IPatientService, PatientService>();
             builder.Services.AddScoped<IDoctorService, DoctorService>();

@@ -1,12 +1,14 @@
 ﻿using TestTask.Application.Interfaces;
 using TestTask.Application.DTOs;
-using TestTask.Domain.Entities;
 using AutoMapper;
-using TestTask.Domain.Interfaces;
+using TestTask.Domain.Interfaces.Common;
+using TestTask.Domain.Interfaces.Persons;
+using TestTask.Domain.Entities.Persons;
+using TestTask.Domain.Entities.Other;
 
 namespace TestTask.Application.Services
 {
-    public class PatientService(IPatientRepository patientRepository, IUchastokRepository uchastokRepository, IMapper mapper) : IPatientService
+    public class PatientService(IPersonRepository<Patient> patientRepository, ICommonRepository<Uchastok> uchastokRepository, IMapper mapper) : IPatientService
     {
         public async Task<IEnumerable<PatientListDto>> GetPatientsAsync(int pageNumber, int pageSize, string sortBy, CancellationToken cancellationToken)
         {

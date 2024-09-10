@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using TestTask.Domain.Entities;
+using TestTask.Domain.Entities.Other;
 
 namespace TestTask.Infrastructure.Data
 {

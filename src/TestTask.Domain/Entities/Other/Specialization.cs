@@ -1,4 +1,4 @@
-﻿namespace TestTask.Domain.Entities
+﻿namespace TestTask.Domain.Entities.Other
 {
     public class Specialization
     {

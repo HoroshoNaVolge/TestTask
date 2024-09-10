@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using TestTask.Domain.Entities;
+using TestTask.Domain.Entities.Persons;
 
 namespace TestTask.Application.DTOs
 {
