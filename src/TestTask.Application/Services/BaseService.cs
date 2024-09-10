@@ -5,10 +5,10 @@ using TestTask.Domain.Interfaces.Persons;
 namespace TestTask.Application.Services
 {
     public abstract class BaseService<TEntityListDto, TEntityEditDto, TEntityBaseDto, TEntity>(IPersonRepository<TEntity> repository, IMapper mapper)
-                                     : IBaseService<TEntityListDto, TEntityEditDto, TEntityBaseDto, TEntity> where TEntity : class
+    : IBaseService<TEntityListDto, TEntityEditDto, TEntityBaseDto, TEntity> where TEntity : class
     {
-        protected readonly IPersonRepository<TEntity> Repository = repository;
-        protected readonly IMapper Mapper = mapper;
+        protected readonly IPersonRepository<TEntity> Repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        protected readonly IMapper Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
         public virtual async Task<IEnumerable<TEntityListDto>> GetAllAsync(int pageNumber, int pageSize, string sortBy, CancellationToken cancellationToken)
         {
@@ -19,7 +19,7 @@ namespace TestTask.Application.Services
 
         public virtual async Task<TEntityEditDto> GetByIdAsync(int id)
         {
-            var entity = await GetEntityFromRepository(id);
+            var entity = await GetByIdOrThrowAsync(id);
             return Mapper.Map<TEntityEditDto>(entity);
         }
 
@@ -31,7 +31,7 @@ namespace TestTask.Application.Services
 
         public virtual async Task UpdateAsync(int id, TEntityEditDto dto)
         {
-            var entity = await GetEntityFromRepository(id);
+            var entity = await GetByIdOrThrowAsync(id);
             Mapper.Map(dto, entity);
             await Repository.UpdateAsync(entity);
         }
@@ -41,7 +41,7 @@ namespace TestTask.Application.Services
             await Repository.DeleteAsync(id);
         }
 
-        public async Task<TEntity> GetEntityFromRepository(int id)
+        public async Task<TEntity> GetByIdOrThrowAsync(int id)
         {
             return await Repository.GetByIdAsync(id) ?? throw new KeyNotFoundException($"{typeof(TEntity).Name} not found");
         }

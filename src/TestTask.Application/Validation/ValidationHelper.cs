@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using TestTask.Domain.Interfaces.Common;
 
 namespace TestTask.Application.Validation
 {
@@ -38,6 +38,14 @@ namespace TestTask.Application.Validation
                 }
 
                 return new ValidationResult("Invalid date format.");
+            }
+        }
+        public static class EntityValidator
+        {
+            public static async Task EnsureExistsAsync<T>(ICommonRepository<T> repository, int? id, string entityName) where T : class
+            {
+                if (id != null && !await repository.ExistsAsync(id.Value))
+                    throw new ArgumentException($"{entityName} with specified ID does not exist.");
             }
         }
     }
