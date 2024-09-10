@@ -5,14 +5,9 @@ using TestTask.Infrastructure.Data;
 
 namespace TestTask.Infrastructure.Repositories.Persons
 {
-    public class DoctorRepository : BasePersonRepository<Doctor>
+    public class DoctorRepository(ApplicationDbContext context, IMemoryCache cache) : BasePersonRepository<Doctor>(context, cache)
     {
         private static readonly string DoctorsCacheKeyPrefix = "DoctorsCache";
-
-        public DoctorRepository(ApplicationDbContext context, IMemoryCache cache)
-            : base(context, cache)
-        {
-        }
 
         protected override IQueryable<Doctor> ApplyIncludes(IQueryable<Doctor> query)
         {
