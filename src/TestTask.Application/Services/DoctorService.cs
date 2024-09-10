@@ -4,6 +4,7 @@ using TestTask.Domain.Interfaces.Common;
 using TestTask.Domain.Interfaces.Persons;
 using TestTask.Domain.Entities.Persons;
 using TestTask.Domain.Entities.Other;
+using static TestTask.Application.Validation.ValidationHelper;
 
 namespace TestTask.Application.Services
 {
@@ -12,21 +13,16 @@ namespace TestTask.Application.Services
     ICommonRepository<Cabinet> cabinetRepository,
     ICommonRepository<Specialization> specializationRepository,
     ICommonRepository<Uchastok> uchastokRepository,
-    IMapper mapper) : BaseService<DoctorListDto, DoctorEditDto, DoctorCreateDto, Doctor>(doctorRepository, mapper)
+    IMapper mapper) : BaseService<DoctorListDto, DoctorEditDto, DoctorBaseDto, Doctor>(doctorRepository, mapper)
     {
         private async Task TryValidateData(DoctorBaseDto doctorDto)
         {
-            if (doctorDto.CabinetId != null && !await cabinetRepository.ExistsAsync(doctorDto.CabinetId.Value))
-                throw new ArgumentException("Cabinet with specified ID does not exist.");
-
-            if (doctorDto.SpecializationId != null && !await specializationRepository.ExistsAsync(doctorDto.SpecializationId.Value))
-                throw new ArgumentException("Specialization with specified ID does not exist.");
-
-            if (doctorDto.UchastokId != null && !await uchastokRepository.ExistsAsync(doctorDto.UchastokId.Value))
-                throw new ArgumentException("Uchastok with specified ID does not exist.");
+            await EntityValidator.EnsureExistsAsync(cabinetRepository, doctorDto.CabinetId, "Cabinet");
+            await EntityValidator.EnsureExistsAsync(specializationRepository, doctorDto.SpecializationId, "Specialization");
+            await EntityValidator.EnsureExistsAsync(uchastokRepository, doctorDto.UchastokId, "Uchastok");
         }
 
-        public override async Task<int> CreateAsync(DoctorCreateDto dto)
+        public override async Task<int> CreateAsync(DoctorBaseDto dto)
         {
             await TryValidateData(dto);
             return await base.CreateAsync(dto);

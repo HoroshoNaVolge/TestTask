@@ -83,7 +83,7 @@ namespace Tests
         [Fact]
         public async Task CreatePatientAsync_AddsPatientToRepository()
         {
-            var patientDto = new PatientCreateDto { UchastokId = 1 };
+            var patientDto = new PatientBaseDto { UchastokId = 1 };
             var patient = new Patient { UchastokId = 1 };
             var expectedId = 1;
 

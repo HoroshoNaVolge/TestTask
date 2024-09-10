@@ -4,20 +4,20 @@ using TestTask.Domain.Interfaces.Common;
 using TestTask.Domain.Interfaces.Persons;
 using TestTask.Domain.Entities.Persons;
 using TestTask.Domain.Entities.Other;
+using static TestTask.Application.Validation.ValidationHelper;
 
 namespace TestTask.Application.Services
 {
     public class PatientService(IPersonRepository<Patient> patientRepository, ICommonRepository<Uchastok> uchastokRepository, IMapper mapper)
-        : BaseService<PatientListDto, PatientEditDto, PatientCreateDto, Patient>(patientRepository, mapper)
+        : BaseService<PatientListDto, PatientEditDto, PatientBaseDto, Patient>(patientRepository, mapper)
     {
 
         private async Task TryValidateData(PatientBaseDto patientDto)
         {
-            if (patientDto.UchastokId != null && !await uchastokRepository.ExistsAsync(patientDto.UchastokId.Value))
-                throw new ArgumentException("Uchastok with specified ID does not exist.");
+            await EntityValidator.EnsureExistsAsync(uchastokRepository, patientDto.UchastokId, "Uchastok");
         }
 
-        public override async Task<int> CreateAsync(PatientCreateDto dto)
+        public override async Task<int> CreateAsync(PatientBaseDto dto)
         {
             await TryValidateData(dto);
             return await base.CreateAsync(dto);
