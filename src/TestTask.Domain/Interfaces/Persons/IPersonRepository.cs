@@ -3,9 +3,9 @@
     public interface IPersonRepository<TEntity> where TEntity : class
     {
         Task<IReadOnlyCollection<TEntity>> GetAllAsync(int pageNumber, int pageSize, string sortBy, CancellationToken cancellationToken);
-        Task<TEntity?> GetByIdAsync(int id);
-        Task<int> AddAsync(TEntity entity);
-        Task UpdateAsync(TEntity entity);
-        Task DeleteAsync(int id);
+        Task<TEntity?> GetByIdAsync(int id, CancellationToken cancellationToken);
+        Task<int> AddAsync(TEntity entity, CancellationToken cancellationToken);
+        Task UpdateAsync(TEntity entity, CancellationToken cancellationToken);
+        Task DeleteAsync(int id, CancellationToken cancellationToken);
     }
 }

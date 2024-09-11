@@ -17,16 +17,16 @@ namespace TestTask.Application.Services
             await EntityValidator.EnsureExistsAsync(uchastokRepository, patientDto.UchastokId, "Uchastok");
         }
 
-        public override async Task<int> CreateAsync(PatientBaseDto dto)
+        public override async Task<int> CreateAsync(PatientBaseDto dto, CancellationToken cancellationToken)
         {
             await TryValidateData(dto);
-            return await base.CreateAsync(dto);
+            return await base.CreateAsync(dto, cancellationToken);
         }
 
-        public override async Task UpdateAsync(int id, PatientEditDto dto)
+        public override async Task UpdateAsync(int id, PatientEditDto dto, CancellationToken cancellationToken)
         {
             await TryValidateData(dto);
-            await base.UpdateAsync(id, dto);
+            await base.UpdateAsync(id, dto, cancellationToken);
         }
     }
 }
