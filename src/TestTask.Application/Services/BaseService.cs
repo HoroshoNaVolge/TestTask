@@ -17,33 +17,39 @@ namespace TestTask.Application.Services
             return Mapper.Map<IEnumerable<TEntityListDto>>(entities);
         }
 
-        public virtual async Task<TEntityEditDto> GetByIdAsync(int id)
+        public virtual async Task<TEntityEditDto> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            var entity = await GetByIdOrThrowAsync(id);
+            cancellationToken.ThrowIfCancellationRequested();
+            var entity = await GetByIdOrThrowAsync(id, cancellationToken);
             return Mapper.Map<TEntityEditDto>(entity);
         }
 
-        public virtual async Task<int> CreateAsync(TEntityBaseDto dto)
+        public virtual async Task<int> CreateAsync(TEntityBaseDto dto, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var entity = Mapper.Map<TEntity>(dto);
-            return await Repository.AddAsync(entity);
+            return await Repository.AddAsync(entity, cancellationToken);
         }
 
-        public virtual async Task UpdateAsync(int id, TEntityEditDto dto)
+        public virtual async Task UpdateAsync(int id, TEntityEditDto dto, CancellationToken cancellationToken)
         {
-            var entity = await GetByIdOrThrowAsync(id);
+            cancellationToken.ThrowIfCancellationRequested();
+            var entity = await GetByIdOrThrowAsync(id, cancellationToken);
             Mapper.Map(dto, entity);
-            await Repository.UpdateAsync(entity);
+            await Repository.UpdateAsync(entity, cancellationToken);
         }
 
-        public virtual async Task DeleteAsync(int id)
+        public virtual async Task DeleteAsync(int id, CancellationToken cancellationToken)
         {
-            await Repository.DeleteAsync(id);
+            cancellationToken.ThrowIfCancellationRequested();
+            await Repository.DeleteAsync(id, cancellationToken);
         }
 
-        public async Task<TEntity> GetByIdOrThrowAsync(int id)
+        public async Task<TEntity> GetByIdOrThrowAsync(int id, CancellationToken cancellationToken)
         {
-            return await Repository.GetByIdAsync(id) ?? throw new KeyNotFoundException($"{typeof(TEntity).Name} not found");
+            cancellationToken.ThrowIfCancellationRequested();
+            return await Repository.GetByIdAsync(id, cancellationToken)
+                ?? throw new KeyNotFoundException($"{typeof(TEntity).Name} not found");
         }
     }
 }

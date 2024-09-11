@@ -48,34 +48,34 @@ namespace TestTask.Infrastructure.Repositories.Persons
             return entities;
         }
 
-        public async Task<TEntity?> GetByIdAsync(int id)
+        public async Task<TEntity?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await context.Set<TEntity>().FindAsync(id);
+            return await context.Set<TEntity>().FindAsync([id], cancellationToken);
         }
 
-        public async Task<int> AddAsync(TEntity entity)
+        public async Task<int> AddAsync(TEntity entity, CancellationToken cancellationToken)
         {
             context.Set<TEntity>().Add(entity);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             ClearCache();
 
             return entity.Id;
         }
 
-        public virtual async Task UpdateAsync(TEntity entity)
+        public virtual async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken)
         {
             context.Set<TEntity>().Update(entity);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             ClearCache();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id, CancellationToken cancellationToken)
         {
-            var entity = await context.Set<TEntity>().FindAsync(id) ?? throw new KeyNotFoundException($"{typeof(TEntity).Name} not found");
+            var entity = await context.Set<TEntity>().FindAsync([id], cancellationToken) ?? throw new KeyNotFoundException($"{typeof(TEntity).Name} not found");
             context.Set<TEntity>().Remove(entity);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             ClearCache();
         }

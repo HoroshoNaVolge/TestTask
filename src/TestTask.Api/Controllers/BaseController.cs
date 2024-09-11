@@ -20,6 +20,9 @@ namespace TestTask.Api.Controllers
             [FromQuery] int pageSize = 10,
             [FromQuery] string sortBy = "UchastokNumber")
         {
+
+            cancellationToken.ThrowIfCancellationRequested();
+
             ValidationHelper.ValidatePageParameters(pageNumber, pageSize);
 
             var entities = await service.GetAllAsync(pageNumber, pageSize, sortBy, cancellationToken);
@@ -27,29 +30,30 @@ namespace TestTask.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public virtual async Task<ActionResult<TEditDto>> GetById(int id)
+        public virtual async Task<ActionResult<TEditDto>> GetById(int id, CancellationToken cancellationToken)
         {
-            return Ok(await service.GetByIdAsync(id));
+            cancellationToken.ThrowIfCancellationRequested();
+            return Ok(await service.GetByIdAsync(id, cancellationToken));
         }
 
         [HttpPost]
-        public virtual async Task<ActionResult> Create(TBaseDto createDto)
+        public virtual async Task<ActionResult> Create(TBaseDto createDto, CancellationToken cancellationToken)
         {
-            var createdId = await service.CreateAsync(createDto);
+            var createdId = await service.CreateAsync(createDto, cancellationToken);
             return CreatedAtAction(nameof(GetById), new { id = createdId }, new { id = createdId });
         }
 
         [HttpPut("{id}")]
-        public virtual async Task<ActionResult> Update(int id, TEditDto editDto)
+        public virtual async Task<ActionResult> Update(int id, TEditDto editDto, CancellationToken cancellationToken)
         {
-            await service.UpdateAsync(id, editDto);
+            await service.UpdateAsync(id, editDto, cancellationToken);
             return Ok();
         }
 
         [HttpDelete("{id}")]
-        public virtual async Task<ActionResult> Delete(int id)
+        public virtual async Task<ActionResult> Delete(int id, CancellationToken cancellationToken)
         {
-            await service.DeleteAsync(id);
+            await service.DeleteAsync(id, cancellationToken);
             return Ok();
         }
     }
